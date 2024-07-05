@@ -7,6 +7,7 @@ export const envSchema = z.object({
   POSTGRES_DB: z.string().optional().default('calendly'),
   POSTGRES_HOST: z.string().optional().default('localhost'),
   POSTGRES_PORT: z.coerce.number().optional().default(5432),
+  NODE_ENV: z.enum(['dev', 'prod']).optional().default('dev'),
 });
 
 export type Env = z.infer<typeof envSchema>;
