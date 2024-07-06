@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseFilters } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseFilters } from '@nestjs/common';
 import { EmployeeAgendaService } from './employee-agenda.service';
 import { ApiTags } from '@nestjs/swagger';
 import { HttpExceptionFilter } from 'common/filters/http-exception.filter';
@@ -18,5 +18,10 @@ export class EmployeeAgendaController {
   @Get('slots')
   find() {
     return this.employeeAgendaService.find();
+  }
+
+  @Post('suggest-slot')
+  suggestSlot(@Query('date') date: string) {
+    return this.employeeAgendaService.suggestSlot(date);
   }
 }

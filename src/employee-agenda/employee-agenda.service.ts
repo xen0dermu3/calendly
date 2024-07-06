@@ -8,6 +8,7 @@ import { EmployeeAgenda } from './entities/employee-agenda.entity';
 import { EmailService } from 'email/email.service';
 import { ConfigService } from '@nestjs/config';
 import { Env } from 'env';
+import { CeoAgenda } from 'ceo-agenda/entities/ceo-agenda.entity';
 
 @Injectable()
 export class EmployeeAgendaService {
@@ -15,7 +16,9 @@ export class EmployeeAgendaService {
 
   constructor(
     @InjectRepository(EmployeeAgenda)
-    private readonly employedAgendaRepository: Repository<EmployeeAgenda>,
+    private readonly employeeAgendaRepository: Repository<EmployeeAgenda>,
+    @InjectRepository(CeoAgenda)
+    private readonly ceoAgendaRepository: Repository<CeoAgenda>,
     private readonly redisService: RedisService,
     private readonly emailService: EmailService,
     private readonly configService: ConfigService<Env>,
@@ -23,8 +26,8 @@ export class EmployeeAgendaService {
 
   async create(createEmployeeAgendaDto: CreateEmployeeAgendaDto) {
     try {
-      const booked = await this.employedAgendaRepository.save(
-        this.employedAgendaRepository.create(createEmployeeAgendaDto),
+      const bookedSlot = await this.employeeAgendaRepository.save(
+        this.employeeAgendaRepository.create(createEmployeeAgendaDto),
       );
 
       const date = formatDate(createEmployeeAgendaDto.startDateTime);
@@ -32,14 +35,26 @@ export class EmployeeAgendaService {
       const availableSpotTimes =
         (await this.redisService.getAvailableSpots(date))!;
 
-      await this.redisService.setAvailableSpots(
-        date,
-        availableSpotTimes.filter((a) => a !== time),
+      const newAvailableSpotTimes = availableSpotTimes.filter(
+        (a) => a !== time,
       );
+      const allSlotsBooked = newAvailableSpotTimes.length === 0;
+
+      if (allSlotsBooked) {
+        await this.ceoAgendaRepository
+          .createQueryBuilder('ceoAgenda')
+          .delete()
+          .where('DATE(startDateTime) = :date', { date })
+          .execute();
+
+        await this.redisService.removeAvailableSpots(date);
+      } else {
+        await this.redisService.setAvailableSpots(date, newAvailableSpotTimes);
+      }
 
       this.sendNotificationCalendarEmail(createEmployeeAgendaDto);
 
-      return booked;
+      return bookedSlot;
     } catch (e) {
       if (e instanceof HttpException) {
         this.logger.error(e.message);
@@ -51,7 +66,51 @@ export class EmployeeAgendaService {
 
   async find() {
     try {
-      return await this.employedAgendaRepository.find();
+      return await this.employeeAgendaRepository.find();
+    } catch (e) {
+      if (e instanceof HttpException) {
+        this.logger.error(e.message);
+
+        throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    }
+  }
+
+  async suggestSlot(date: string) {
+    try {
+      let spot = await this.ceoAgendaRepository
+        .createQueryBuilder('ceoAgenda')
+        .where('DATE(ceoAgenda.startDateTime) = :date', { date })
+        .getOne();
+
+      if (spot) {
+        const availableSpotTimes =
+          (await this.redisService.getAvailableSpots(date))!;
+
+        return {
+          date,
+          time: availableSpotTimes[0],
+        };
+      }
+
+      spot = (await this.ceoAgendaRepository
+        .createQueryBuilder('ceoAgenda')
+        .orderBy(
+          'ABS(EXTRACT(EPOCH FROM ceoAgenda.startDateTime - DATE(:date)))',
+        )
+        .setParameter('date', date)
+        .limit(1)
+        .getOne())!;
+
+      date = formatDate(spot.startDateTime);
+
+      const availableSpotTimes =
+        (await this.redisService.getAvailableSpots(date))!;
+
+      return {
+        date,
+        time: availableSpotTimes[0],
+      };
     } catch (e) {
       if (e instanceof HttpException) {
         this.logger.error(e.message);
