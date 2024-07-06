@@ -1,73 +1,41 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Mini Calendly App
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+[Original](https://meowing-ceres-b53.notion.site/Mini-Calendly-App-7bcb17d34e644d97bb9d69d3aff3df90)
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Please create an app which will satisfy next business logic.
 
-## Description
+I am John, I am CEO of Tech Company, and I want to have One-to-One sessions with my employees. To make sure that I will find this time I need to book slots in my agenda.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+I want to have possibility to choose from Monday to Friday my free spots, and depending on selected spots system should generate available slots for my employees.
 
-## Installation
+```jsx
+I pick 12:00 - 14:00 and step(duration) 15 min for Monday;
+I pick 16:00 - 18:00 and step(duration) 30 min for Friday;
 
-```bash
-$ pnpm install
+for rest of the days, it should be impossible to select any spot.
+
+// When employee select date for example 1 July 2024 (Monday) he will see next
+// available spots
+
+12:00 12:15 12:30 12:45 13:00 13:15 13:30 13:45
+
+// When employee select date for example 5 July 2024 (Friday) he will see next
+// available spots
+
+16:00 16:30 17:00 17:30
 ```
 
-## Running the app
+1. When employee select date & free spot, I should receive a notification via email and also google calendar event.
+   _Hints: ical file should be attached in my email notification_
+2. Selected spot should be eliminated from list, for avoiding overlapping.
+3. In case if all spots are occupied for selected days, let’s have an additional endpoint which will sugerate the nears free slot for user
+   _(Ex: In case if my schedule is occupied for 2 weeks from 1 Jul to 14 Jul, and user select 5 Jul then the nears slot will be 12:00 for 15 Jul)_
 
-```bash
-# development
-$ pnpm run start
+---
 
-# watch mode
-$ pnpm run start:dev
+**From technical point of view:**
 
-# production mode
-$ pnpm run start:prod
-```
-
-## Test
-
-```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+- Solution should be on NestJS Framework
+- PostgresSQL & TypeORM
+- DTO Validations
+- Documentation

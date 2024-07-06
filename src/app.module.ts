@@ -1,7 +1,13 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { envSchema, Env } from '@app/env';
+import { CeoAgendaModule } from 'ceo-agenda/ceo-agenda.module';
+import { CeoAgenda } from 'ceo-agenda/entities/ceo-agenda.entity';
+import { Env, envSchema } from 'env';
+import { ScheduleModule } from '@nestjs/schedule';
+import { EmployeeAgendaModule } from './employee-agenda/employee-agenda.module';
+import { EmployeeAgenda } from 'employee-agenda/entities/employee-agenda.entity';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -20,12 +26,16 @@ import { envSchema, Env } from '@app/env';
         username: configService.get('POSTGRES_USER'),
         password: configService.get('POSTGRES_PASSWORD'),
         database: configService.get('POSTGRES_DB'),
-        entities: [],
+        entities: [CeoAgenda, EmployeeAgenda],
         synchronize: configService.get('NODE_ENV') === 'dev',
         logging: configService.get('NODE_ENV') === 'dev' ? 'all' : false,
         logger: 'advanced-console',
       }),
     }),
+    ScheduleModule.forRoot(),
+    RedisModule,
+    CeoAgendaModule,
+    EmployeeAgendaModule,
   ],
 })
 export class AppModule {}
