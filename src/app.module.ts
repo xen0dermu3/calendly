@@ -8,6 +8,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { EmployeeAgendaModule } from './employee-agenda/employee-agenda.module';
 import { EmployeeAgenda } from 'employee-agenda/entities/employee-agenda.entity';
 import { RedisModule } from './redis/redis.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { RedisModule } from './redis/redis.module';
     RedisModule,
     CeoAgendaModule,
     EmployeeAgendaModule,
+    EmailModule,
   ],
 })
 export class AppModule {}

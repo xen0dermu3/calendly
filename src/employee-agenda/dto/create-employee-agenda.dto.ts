@@ -12,9 +12,9 @@ export class CreateEmployeeAgendaDto {
   startDateTime!: string;
 
   @ApiProperty({
-    example: '8b961e4c-e67c-4d55-a8ba-6d35d754c4f3',
+    example: 'john.doe@mail.com',
   })
   @IsNotEmpty()
   @IsString()
-  employeeId!: string;
+  email!: string;
 }

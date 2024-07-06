@@ -6,10 +6,20 @@ import { CeoAgenda } from 'ceo-agenda/entities/ceo-agenda.entity';
 import { EmployeeAgenda } from './entities/employee-agenda.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RedisModule } from 'redis/redis.module';
+import { EmployeeAgendaCron } from './cron/employee-agenda.cron';
+import { EmailModule } from 'email/email.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([CeoAgenda, EmployeeAgenda]), RedisModule],
+  imports: [
+    TypeOrmModule.forFeature([CeoAgenda, EmployeeAgenda]),
+    RedisModule,
+    EmailModule,
+  ],
   controllers: [EmployeeAgendaController],
-  providers: [EmployeeAgendaService, IsCorrectDateTimeValidator],
+  providers: [
+    EmployeeAgendaService,
+    IsCorrectDateTimeValidator,
+    EmployeeAgendaCron,
+  ],
 })
 export class EmployeeAgendaModule {}

@@ -12,7 +12,7 @@ export class EmployeeAgenda {
   id!: string;
 
   @Column()
-  employeeId!: string;
+  email!: string;
 
   @Column()
   startDateTime!: Date;
