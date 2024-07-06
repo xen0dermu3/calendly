@@ -7,7 +7,7 @@ import {
 } from 'class-validator';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateCeoAgendaDto } from 'ceo-agenda/dto/create-ceo-agenda.dto';
-import { addMinutes, compareAsc, isEqual } from 'date-fns';
+import { addMinutes, compareAsc, isBefore, isEqual } from 'date-fns';
 
 @ValidatorConstraint({ async: true })
 @Injectable()
@@ -32,19 +32,19 @@ export class IsCorrectDateTimeValidator
       (args.object as CreateCeoAgendaDto)['endDateTime'],
     );
 
-    // const now = new Date();
+    const now = new Date();
 
-    // if (isBefore(startDateTime, now)) {
-    //   throw new BadRequestException(
-    //     `startDateTime can not be less than now: ${now}`,
-    //   );
-    // }
+    if (isBefore(startDateTime, now)) {
+      throw new BadRequestException(
+        `startDateTime can not be less than now: ${now}`,
+      );
+    }
 
-    // if (isBefore(endDateTime, now)) {
-    //   throw new BadRequestException(
-    //     'endDateTime can not be less than now: ${now}',
-    //   );
-    // }
+    if (isBefore(endDateTime, now)) {
+      throw new BadRequestException(
+        'endDateTime can not be less than now: ${now}',
+      );
+    }
 
     if (isEqual(startDateTime, endDateTime)) {
       throw new BadRequestException(
